@@ -11,25 +11,16 @@ jobs:
         node-version: [18.x]
 
     steps:
-      - name: Check opened PR
-        id: check-opened-pr-step
-        uses: actions/check-opened-pr-action@v0.1
       - uses: actions/checkout@v3
-        if: github.event_name != 'push' || steps.check-opened-pr-step.outputs.exists == 'false'
       - name: Use Node.js ${{ matrix.node-version }}
-        if: github.event_name != 'push' || steps.check-opened-pr-step.outputs.exists == 'false'
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install
-        if: github.event_name != 'push' || steps.check-opened-pr-step.outputs.exists == 'false'
         run: npm install
       - name: Test
-        if: github.event_name != 'push' || steps.check-opened-pr-step.outputs.exists == 'false'
         run: npm run test
       - name: Build Lib
-        if: github.event_name != 'push' || steps.check-opened-pr-step.outputs.exists == 'false'
         run: npm run build:lib
       - name: Build Site
-        if: github.event_name != 'push' || steps.check-opened-pr-step.outputs.exists == 'false'
         run: npm run build:site
