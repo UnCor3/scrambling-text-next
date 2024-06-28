@@ -13,8 +13,6 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  //@ts-ignore
-  props: {},
   elm: "span",
 });
 

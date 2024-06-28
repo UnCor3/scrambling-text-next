@@ -20,8 +20,6 @@ const props = withDefaults(
     props?: Record<string, any>;
   }>(),
   {
-    //@ts-ignore
-    props: {},
     elm: "span",
     once: false,
   }

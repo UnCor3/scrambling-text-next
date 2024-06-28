@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import markdownit from "markdown-it";
 import prism from "prismjs";
-//@ts-ignore
 const hljsmd = markdownit({
-  //@ts-ignore
   highlight: function (str) {
     return (
       '<pre><code class="hljs">' +
