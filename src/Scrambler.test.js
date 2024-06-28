@@ -23,7 +23,9 @@ describe("Scrambler", () => {
     const scrambler = new Scrambler();
 
     texts.forEach((text) => {
-      scrambler.scramble(text, handleScramble);
+      scrambler.scramble(text, {
+        onIteration: handleScramble,
+      });
       expect(handleScramble).toHaveBeenLastCalledWith(text);
     });
   });
@@ -33,9 +35,13 @@ describe("Scrambler", () => {
       const scrambler = new Scrambler();
 
       texts.forEach((text) => {
-        scrambler.scramble(text, handleScramble, {
-          characters: ["a", "b", "c"],
-        });
+        scrambler.scramble(
+          text,
+          { onIteration: handleScramble },
+          {
+            characters: ["a", "b", "c"],
+          }
+        );
         expect(handleScramble).toHaveBeenLastCalledWith(text);
       });
     });
