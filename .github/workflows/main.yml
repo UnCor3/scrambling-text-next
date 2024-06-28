@@ -8,38 +8,28 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [12.x]
+        node-version: [18.x]
 
     steps:
       - name: Check opened PR
         id: check-opened-pr-step
-        uses: sogoagain/check-opened-pr-action@v0.1
-      - uses: actions/checkout@v2
+        uses: actions/check-opened-pr-action@v0.1
+      - uses: actions/checkout@v3
         if: github.event_name != 'push' || steps.check-opened-pr-step.outputs.exists == 'false'
       - name: Use Node.js ${{ matrix.node-version }}
         if: github.event_name != 'push' || steps.check-opened-pr-step.outputs.exists == 'false'
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install
         if: github.event_name != 'push' || steps.check-opened-pr-step.outputs.exists == 'false'
-        run: npm ci
+        run: npm install
       - name: Test
         if: github.event_name != 'push' || steps.check-opened-pr-step.outputs.exists == 'false'
-        run: npm test
-      - name: Lint
+        run: npm run test
+      - name: Build Lib
         if: github.event_name != 'push' || steps.check-opened-pr-step.outputs.exists == 'false'
-        run: npm run lint
-      - name: Build
+        run: npm run build:lib
+      - name: Build Site
         if: github.event_name != 'push' || steps.check-opened-pr-step.outputs.exists == 'false'
-        run: npm run build
-      - name: Copy
-        if: github.event_name != 'push' || steps.check-opened-pr-step.outputs.exists == 'false'
-        run: cp ./dist/scrambling-text.js ./examples/scrambling-text.js
-      - name: Deploy to GitHub Pages
-        if: (github.event_name != 'push' || steps.check-opened-pr-step.outputs.exists == 'false') && github.ref == 'refs/heads/master'
-        uses: JamesIves/github-pages-deploy-action@3.5.9
-        with:
-          BRANCH: gh-pages
-          FOLDER: examples
-          BASE_BRANCH: master
+        run: npm run build:site
