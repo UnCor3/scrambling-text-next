@@ -1,0 +1,48 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap");
+
+@font-face {
+  font-family: "Aalto-Display";
+  src: url("/src/docs/assets/Aalto-Display.otf");
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Roboto", sans-serif;
+}
+
+body {
+  max-width: 1200px;
+  color: white;
+  margin: auto;
+  margin-top: 5rem;
+  background-color: rgb(13, 17, 23);
+}
+
+#text {
+  font-size: 3rem;
+  text-align: center;
+}
+
+#code-container {
+  margin-top: 5rem;
+}
+
+.example {
+  margin-top: 5rem;
+}
+
+.example .text {
+  font-size: 4rem;
+  text-align: center;
+}
+
+.example .text > * {
+  font-size: 4rem;
+  font-family: Aalto-Display !important;
+}
+
+.token.operator {
+  background-color: transparent !important;
+}

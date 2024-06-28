@@ -1,8 +1,50 @@
+import { OnFinished, Options } from "@/types";
+import { normalizeOptions } from "@/helpers";
+
 export default class Scrambler {
+  characters;
+  maxCounter;
+  targetText;
+  scrambledText;
+  encodingCounters: any[];
+  decodingCounters: any[];
+  frameId: any;
+  onScramble: any;
+  frameIndex;
+  onFinished: OnFinished | undefined;
+  isGoingOn: boolean;
+
   static get CHARACTERS() {
     return {
-      DEFAULT: ['@', '#', '$', '%', '£', '&', '*', '§', '+', '_'],
-      ALPHABET: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
+      DEFAULT: ["@", "#", "$", "%", "£", "&", "*", "§", "+", "_"],
+      ALPHABET: [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+        "g",
+        "h",
+        "i",
+        "j",
+        "k",
+        "l",
+        "m",
+        "n",
+        "o",
+        "p",
+        "q",
+        "r",
+        "s",
+        "t",
+        "u",
+        "v",
+        "w",
+        "x",
+        "y",
+        "z",
+      ],
     };
   }
 
@@ -10,52 +52,56 @@ export default class Scrambler {
     this.characters = [...Scrambler.CHARACTERS.DEFAULT];
     this.maxCounter = 12;
 
-    this.targetText = '';
-    this.scrambledText = '';
+    this.targetText = "";
+    this.scrambledText = "";
     this.encodingCounters = [];
     this.decodingCounters = [];
     this.onScramble = null;
-
+    this.onFinished = undefined;
     this.frameId = null;
     this.frameIndex = 0;
+    this.isGoingOn = false;
   }
 
-  scramble(text, onScramble, option = null) {
-    if (option?.characters) {
-      this.characters = [...option.characters];
+  scramble(text: string, _options: Options) {
+    const options = normalizeOptions(_options);
+    if (this.isGoingOn && options.preventGettingCalledMultipleTimes) return;
+    this.isGoingOn = true;
+    if (options?.characters) {
+      this.characters = [...options.characters];
     } else {
       this.characters = [...Scrambler.CHARACTERS.DEFAULT];
     }
     this.targetText = text;
     this.encodingCounters = this._generateCounters(this.scrambledText);
     this.decodingCounters = this._generateCounters(this.targetText);
-    this.onScramble = onScramble;
-
+    this.onScramble = options.onIteration;
+    this.onFinished = options.onFinished;
     this.frameId = null;
     this.frameIndex = 0;
 
     this.frameId = requestAnimationFrame(() => this._encode());
   }
 
-  _randomText(length) {
-    let text = '';
+  private _randomText(length: number) {
+    let text = "";
     for (let i = 0; i < length; i += 1) {
-      text += this.characters[
-        Math.floor(Math.random() * this.characters.length)
-      ];
+      text +=
+        this.characters[Math.floor(Math.random() * this.characters.length)];
     }
     return text;
   }
 
-  _generateCounters(text) {
+  private _generateCounters(text: string) {
     return new Array(text.length)
       .fill(0)
       .map(() => Math.floor(Math.random() * this.maxCounter) + 1);
   }
 
-  _encode() {
+  private _encode() {
     if (this.frameIndex === 0) {
-      const finished = this.encodingCounters.reduce((acc, crr) => acc + crr, 0) === 0;
+      const finished =
+        this.encodingCounters.reduce((acc, crr) => acc + crr, 0) === 0;
       if (finished) {
         this.frameId = requestAnimationFrame(() => this._fill());
         return;
@@ -63,9 +109,9 @@ export default class Scrambler {
 
       for (let i = 0; i < this.encodingCounters.length; i += 1) {
         if (this.encodingCounters[i] === 0) {
-          const temp = this.scrambledText.split('');
+          const temp = this.scrambledText.split("");
           temp[i] = this._randomText(1);
-          this.scrambledText = temp.join('');
+          this.scrambledText = temp.join("");
           continue;
         }
         this.encodingCounters[i] -= 1;
@@ -77,7 +123,7 @@ export default class Scrambler {
     this.frameId = requestAnimationFrame(() => this._encode());
   }
 
-  _fill() {
+  private _fill() {
     if (this.frameIndex === 0) {
       const finished = this.scrambledText.length === this.targetText.length;
       if (finished) {
@@ -85,8 +131,11 @@ export default class Scrambler {
         return;
       }
 
-      const increase = this.scrambledText.length < this.targetText.length ? 1 : -1;
-      this.scrambledText = this._randomText(this.scrambledText.length + increase);
+      const increase =
+        this.scrambledText.length < this.targetText.length ? 1 : -1;
+      this.scrambledText = this._randomText(
+        this.scrambledText.length + increase
+      );
       this.onScramble(this.scrambledText);
     }
 
@@ -94,23 +143,24 @@ export default class Scrambler {
     this.frameId = requestAnimationFrame(() => this._fill());
   }
 
-  _decode() {
+  private _decode() {
     const finished = this.scrambledText === this.targetText;
     if (finished) {
       cancelAnimationFrame(this.frameId);
+      this.onFinished?.(this.scrambledText);
+      this.isGoingOn = false;
       return;
     }
 
     if (this.frameIndex === 0) {
-      let decodingText = '';
+      let decodingText = "";
       for (let i = 0; i < this.decodingCounters.length; i += 1) {
         if (this.decodingCounters[i] === 0) {
           decodingText += this.targetText[i];
           continue;
         }
-        decodingText += this.characters[Math.floor(
-          Math.random() * this.characters.length,
-        )];
+        decodingText +=
+          this.characters[Math.floor(Math.random() * this.characters.length)];
         this.decodingCounters[i] -= 1;
       }
       this.scrambledText = decodingText;
