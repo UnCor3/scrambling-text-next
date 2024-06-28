@@ -66,5 +66,7 @@
     "vite-plugin-dts": "^3.9.1",
     "vitest": "^1.6.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "typescript": "5.4"
+  }
 }
