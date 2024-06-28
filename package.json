@@ -2,7 +2,7 @@
   "name": "scrambling-text-next",
   "version": "1.0.0",
   "type": "module",
-  "description": "A very simple JavaScript library written in vanilla js for scrambling text.",
+  "description": "A super lite (4.29 kB │ gzip: 1.20kB) JavaScript library written in vanilla js with ready to use components for React, Vue for scrambling text.",
   "files": [
     "dist"
   ],
